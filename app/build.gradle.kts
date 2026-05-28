@@ -11,15 +11,28 @@ android {
   compileSdk { version = release(36) { minorApiLevel = 1 } }
 
   defaultConfig {
-    applicationId = "com.aistudio.teddycabs.kxmpzq"
     minSdk = 24
     targetSdk = 36
     versionCode = 1
     versionName = "1.0"
-    
     manifestPlaceholders["MAPS_API_KEY"] = "MY_MAPS_API_KEY"
-
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  }
+
+  flavorDimensions += "app"
+  productFlavors {
+    create("passenger") {
+      dimension = "app"
+      applicationId = "com.teddycabs.passenger"
+      versionNameSuffix = "-passenger"
+      resValue("string", "app_name", "Teddy Rides")
+    }
+    create("driver") {
+      dimension = "app"
+      applicationId = "com.teddycabs.driver"
+      versionNameSuffix = "-driver"
+      resValue("string", "app_name", "Teddy Driver")
+    }
   }
 
   signingConfigs {
@@ -49,41 +62,35 @@ android {
       signingConfig = signingConfigs.getByName("debugConfig")
     }
   }
+
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
   }
+
   buildFeatures {
     compose = true
     buildConfig = true
   }
-  
+
   secrets {
     propertiesFileName = ".env"
     defaultPropertiesFileName = ".env.example"
   }
-  
+
   testOptions { unitTests { isIncludeAndroidResources = true } }
 }
 
-// Configure the Secrets Gradle Plugin to use .env and .env.example files
-// to match the convention used in Web projects.
 secrets {
   propertiesFileName = ".env"
   defaultPropertiesFileName = ".env.example"
 }
 
-// Some unused dependencies are commented out below instead of being removed.
-// This makes it easy to add them back in the future if needed.
 dependencies {
   implementation(platform(libs.androidx.compose.bom))
   implementation(platform(libs.firebase.bom))
-  // implementation(libs.accompanist.permissions)
+  implementation(libs.accompanist.permissions)
   implementation(libs.androidx.activity.compose)
-  // implementation(libs.androidx.camera.camera2)
-  // implementation(libs.androidx.camera.core)
-  // implementation(libs.androidx.camera.lifecycle)
-  // implementation(libs.androidx.camera.view)
   implementation(libs.androidx.compose.material.icons.core)
   implementation(libs.androidx.compose.material.icons.extended)
   implementation(libs.androidx.compose.material3)
@@ -93,22 +100,23 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.maps.compose)
   implementation(libs.play.services.maps)
-  // implementation(libs.androidx.datastore.preferences)
+  implementation(libs.play.services.auth)
+  implementation(libs.play.services.location)
+  implementation(libs.coil.compose)
+  implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.lifecycle.runtime.compose)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.lifecycle.viewmodel.compose)
   implementation(libs.androidx.navigation.compose)
   implementation(libs.androidx.room.ktx)
   implementation(libs.androidx.room.runtime)
-  // implementation(libs.coil.compose)
   implementation(libs.converter.moshi)
-  // implementation(libs.firebase.ai)
+  implementation(libs.firebase.ai)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.logging.interceptor)
   implementation(libs.moshi.kotlin)
   implementation(libs.okhttp)
-  // implementation(libs.play.services.location)
   implementation(libs.retrofit)
   testImplementation(libs.androidx.compose.ui.test.junit4)
   testImplementation(libs.androidx.core)

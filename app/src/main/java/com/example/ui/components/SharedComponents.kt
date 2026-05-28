@@ -1,200 +1,271 @@
 package com.example.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.ui.theme.GoldGradient
-import com.example.ui.theme.CreamText
-import com.example.ui.theme.GoldPrimary
+import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.*
+import com.example.ui.theme.*
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+
+// ─── Logo Placeholder ────────────────────────────────────────────────────────
 
 @Composable
-fun PrimaryButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = onClick,
+fun LogoPlaceholder(modifier: Modifier = Modifier, size: Dp = 96.dp) {
+    Box(
         modifier = modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .shadow(12.dp, RoundedCornerShape(8.dp), spotColor = GoldPrimary, ambientColor = GoldPrimary),
-        shape = RoundedCornerShape(8.dp),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = Color.Black
-        )
+            .size(size)
+            .background(TcGoldFaint, RoundedCornerShape(size * 0.22f))
+            .border(1.5.dp, TcGold.copy(alpha = 0.35f), RoundedCornerShape(size * 0.22f)),
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(brush = GoldGradient, shape = RoundedCornerShape(8.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = text.uppercase(), fontWeight = FontWeight.ExtraBold, letterSpacing = 2.sp, color = Color(0xFF111111))
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(Icons.Default.Add, null, tint = TcGold.copy(0.5f), modifier = Modifier.size(size * 0.32f))
+            Spacer(Modifier.height(2.dp))
+            Text("LOGO", color = TcGold.copy(0.45f), fontSize = 8.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
         }
     }
 }
 
+// ─── Loader ──────────────────────────────────────────────────────────────────
+
 @Composable
-fun SecondaryButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    androidx.compose.material3.OutlinedButton(
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(56.dp),
-        shape = RoundedCornerShape(4.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = MaterialTheme.colorScheme.primary
+fun TeddyLoader(modifier: Modifier = Modifier, size: Dp = 36.dp) {
+    CircularProgressIndicator(
+        modifier = modifier.size(size),
+        color = TcGold,
+        strokeWidth = 2.dp,
+        trackColor = TcGold.copy(alpha = 0.12f)
+    )
+}
+
+// ─── Buttons ─────────────────────────────────────────────────────────────────
+
+@Composable
+fun TeddyButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, loading: Boolean = false) {
+    Button(
+        onClick = onClick, enabled = enabled && !loading,
+        modifier = modifier.fillMaxWidth().height(52.dp),
+        shape = RoundedCornerShape(14.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = TcGold, contentColor = TcBlack,
+            disabledContainerColor = TcGold.copy(0.3f), disabledContentColor = TcBlack.copy(0.4f)
         )
     ) {
-        Text(text = text, fontWeight = FontWeight.SemiBold, letterSpacing = 2.sp)
+        if (loading) TeddyLoader(size = 20.dp) else Text(text, fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = 0.3.sp)
     }
 }
+
+@Composable
+fun TeddyOutlineButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth().height(52.dp),
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, TcBorder),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = TcTextPrimary)
+    ) {
+        Text(text, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+    }
+}
+
+@Composable
+fun GoogleSignInButton(onResult: (String?, String?) -> Unit, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            try {
+                val account = GoogleSignIn.getSignedInAccountFromIntent(result.data).getResult(ApiException::class.java)
+                onResult(account?.email, account?.displayName)
+            } catch (_: ApiException) { onResult(null, null) }
+        } else onResult(null, null)
+    }
+    OutlinedButton(
+        onClick = {
+            // TODO: Replace "YOUR_WEB_CLIENT_ID" with your Firebase OAuth 2.0 Web Client ID
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build()
+            launcher.launch(GoogleSignIn.getClient(context, gso).signInIntent)
+        },
+        modifier = modifier.fillMaxWidth().height(52.dp),
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, TcBorder),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = TcTextPrimary)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            Text("G", color = Color(0xFF4285F4), fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+            Spacer(Modifier.width(10.dp))
+            Text("Continue with Google", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+        }
+    }
+}
+
+// ─── TextField ───────────────────────────────────────────────────────────────
 
 @Composable
 fun TeddyTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    label: String,
+    placeholder: String,
     modifier: Modifier = Modifier,
+    leadingIcon: ImageVector? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Next,
     isPassword: Boolean = false,
-    leadingIcon: (@Composable () -> Unit)? = null
+    singleLine: Boolean = true
 ) {
-    androidx.compose.material3.TextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label, color = Color.Gray, fontWeight = FontWeight.Medium) },
-        leadingIcon = leadingIcon,
-        modifier = modifier.fillMaxWidth(),
-        colors = androidx.compose.material3.TextFieldDefaults.colors(
-            focusedContainerColor = Color(0xFF252527),
-            unfocusedContainerColor = Color(0xFF252527),
-            focusedIndicatorColor = GoldPrimary,
-            unfocusedIndicatorColor = Color.Transparent,
-            cursorColor = GoldPrimary,
-        ),
-        shape = RoundedCornerShape(8.dp),
-        singleLine = true,
-        textStyle = androidx.compose.ui.text.TextStyle(color = CreamText, fontWeight = FontWeight.Medium, fontSize = 16.sp),
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None
+    var passwordVisible by remember { mutableStateOf(false) }
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(TcCard, RoundedCornerShape(14.dp))
+            .border(1.dp, TcBorder, RoundedCornerShape(14.dp))
+            .padding(horizontal = 16.dp, vertical = 16.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (leadingIcon != null) {
+                Icon(leadingIcon, null, tint = TcTextMuted, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(12.dp))
+            }
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.weight(1f),
+                textStyle = TextStyle(color = TcTextPrimary, fontSize = 15.sp, fontWeight = FontWeight.Normal),
+                cursorBrush = SolidColor(TcGold),
+                keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
+                visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
+                singleLine = singleLine,
+                decorationBox = { inner ->
+                    if (value.isEmpty()) Text(placeholder, color = TcTextMuted, fontSize = 15.sp)
+                    inner()
+                }
+            )
+            if (isPassword) {
+                IconButton(onClick = { passwordVisible = !passwordVisible }, modifier = Modifier.size(20.dp)) {
+                    Icon(if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility, null, tint = TcTextMuted, modifier = Modifier.size(18.dp))
+                }
+            } else trailingIcon?.invoke()
+        }
+    }
+}
+
+// ─── OTP Input ───────────────────────────────────────────────────────────────
+
+@Composable
+fun OtpInputRow(otp: String, onOtpChange: (String) -> Unit, length: Int = 6) {
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        repeat(length) { i ->
+            val char = otp.getOrNull(i)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(0.85f)
+                    .background(TcCard, RoundedCornerShape(12.dp))
+                    .border(
+                        1.5.dp,
+                        if (i == otp.length) TcGold else if (char != null) TcGold.copy(0.4f) else TcBorder,
+                        RoundedCornerShape(12.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(char?.toString() ?: "", color = TcTextPrimary, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+    Spacer(Modifier.height(4.dp))
+    // Hidden real input below — controlled by parent via onOtpChange
+}
+
+// ─── Top Bar ─────────────────────────────────────────────────────────────────
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TeddyTopBar(title: String, onBack: (() -> Unit)? = null, actions: @Composable RowScope.() -> Unit = {}) {
+    TopAppBar(
+        title = { Text(title, color = TcTextPrimary, fontWeight = FontWeight.Bold, fontSize = 18.sp) },
+        navigationIcon = {
+            if (onBack != null) IconButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TcTextPrimary)
+            }
+        },
+        actions = actions,
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = TcBlack)
     )
+}
+
+// ─── Divider with label ───────────────────────────────────────────────────────
+
+@Composable
+fun LabeledDivider(label: String = "or") {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Divider(modifier = Modifier.weight(1f), color = TcBorder)
+        Text(label, color = TcTextMuted, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 12.dp))
+        Divider(modifier = Modifier.weight(1f), color = TcBorder)
+    }
+}
+
+// ─── Section label ────────────────────────────────────────────────────────────
+
+@Composable
+fun SectionLabel(text: String, modifier: Modifier = Modifier) {
+    Text(text, color = TcTextMuted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp, modifier = modifier)
+}
+
+// ─── Stat card ────────────────────────────────────────────────────────────────
+
+@Composable
+fun StatCard(value: String, label: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .background(TcCard, RoundedCornerShape(14.dp))
+            .border(1.dp, TcBorder, RoundedCornerShape(14.dp))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(value, color = TcGold, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 0.5.sp)
+        Spacer(Modifier.height(2.dp))
+        Text(label, color = TcTextMuted, fontSize = 11.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
+    }
+}
+
+// ─── Legacy compatibility ─────────────────────────────────────────────────────
+
+@Composable
+fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) = TeddyButton(text, onClick, modifier)
+
+@Composable
+fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) = TeddyOutlineButton(text, onClick, modifier)
+
+@Composable
+fun TeddyTextField(value: String, onValueChange: (String) -> Unit, label: String, modifier: Modifier = Modifier, isPassword: Boolean = false, leadingIcon: (@Composable () -> Unit)? = null) {
+    TeddyTextField(value = value, onValueChange = onValueChange, placeholder = label, modifier = modifier, isPassword = isPassword)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TeddyTopAppBar(
-    title: String,
-    onBack: (() -> Unit)? = null,
-    actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {}
-) {
-    TopAppBar(
-        title = {
-            Text(
-                text = title, 
-                color = GoldPrimary,
-                fontFamily = FontFamily.Serif,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                letterSpacing = 1.sp
-            )
-        },
-        navigationIcon = {
-            if (onBack != null) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-        },
-        actions = actions,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background
-        )
-    )
-}
-
-@Composable
-fun SupportChatModal(
-    onDismiss: () -> Unit
-) {
-    var issue by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
-    androidx.compose.material3.AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { 
-            Text(text = "Support Chat", color = MaterialTheme.colorScheme.primary) 
-        },
-        text = { 
-            androidx.compose.foundation.layout.Column {
-                Text("How can we help you with your trip?", color = Color.White)
-                androidx.compose.foundation.layout.Spacer(Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = issue,
-                    onValueChange = { issue = it },
-                    label = { Text("Describe your issue...") },
-                    modifier = Modifier.fillMaxWidth().height(120.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = Color.DarkGray,
-                        focusedLabelColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLabelColor = Color.Gray
-                    )
-                )
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.surface,
-        confirmButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) { 
-                Text("Send Message", color = Color.Black) 
-            }
-        },
-        dismissButton = {
-            androidx.compose.material3.TextButton(onClick = onDismiss) { 
-                Text("Cancel", color = Color.LightGray) 
-            }
-        }
-    )
-}
-
+fun TeddyTopAppBar(title: String, onBack: (() -> Unit)? = null, actions: @Composable RowScope.() -> Unit = {}) = TeddyTopBar(title, onBack, actions)

@@ -1,0 +1,1 @@
+- [Teddy Cabs Android Architecture](android-flavors.md) — Two APKs via product flavors; passenger + driver source sets; AppContent() per flavor pattern.
