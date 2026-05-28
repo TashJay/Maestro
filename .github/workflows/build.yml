@@ -23,7 +23,7 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
 
     - name: Generate Gradle Wrapper
-      run: gradle wrapper
+      run: gradle wrapper -Pandroid.defaults.buildfeatures.resvalues=true
 
     - name: Grant Execute Permission for Gradle
       run: chmod +x ./gradlew
@@ -45,21 +45,4 @@ jobs:
       with:
         name: driver-debug-apk
         path: '**/build/outputs/apk/driver/debug/app-driver-debug.apk'
-    - name: Upload Passenger APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: passenger-debug-apk
-        path: '**/build/outputs/apk/passenger/debug/app-passenger-debug.apk'
-
-    - name: Upload Driver APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: driver-debug-apk
-        path: '**/build/outputs/apk/driver/debug/app-driver-debug.apk'
-
-    - name: Upload Driver APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: driver-debug-apk
-        path: app/build/outputs/apk/driver/debug/app-driver-debug.apk
         
