@@ -29,11 +29,22 @@ jobs:
       run: chmod +x ./gradlew
 
     - name: Build Passenger APK
-      run: ./gradlew assemblePassengerDebug
+      run: ./gradlew assemblePassengerDebug -Pandroid.defaults.buildfeatures.resvalues=true
 
     - name: Build Driver APK
-      run: ./gradlew assembleDriverDebug
+      run: ./gradlew assembleDriverDebug -Pandroid.defaults.buildfeatures.resvalues=true
 
+    - name: Upload Passenger APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: passenger-debug-apk
+        path: '**/build/outputs/apk/passenger/debug/app-passenger-debug.apk'
+
+    - name: Upload Driver APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: driver-debug-apk
+        path: '**/build/outputs/apk/driver/debug/app-driver-debug.apk'
     - name: Upload Passenger APK Artifact
       uses: actions/upload-artifact@v4
       with:
