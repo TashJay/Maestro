@@ -18,19 +18,130 @@
 </nav>
 
 <div class="page">
+
   <!-- HERO -->
-  <section class="hero">
+  <section class="hero hero-split">
     <div class="hero-bg"></div>
     <div class="hero-grid"></div>
-    <div class="hero-content">
+
+    <div class="hero-left">
       <div class="hero-eyebrow">
-        <span class="pulse-dot"></span> Live in Nairobi
+        <span class="pulse-dot"></span> Nairobi and beyond
       </div>
-      <h1>TEDDY CABS</h1>
-      <p class="hero-sub">Premium ride hailing — black &amp; gold elegance</p>
+      <h1>TEDDY<br>CABS</h1>
+      <p class="hero-sub">Premium ride hailing — wherever you're going, we get you there.</p>
       <div class="hero-actions">
         <a href="/passenger" class="btn btn-gold">Book a Ride</a>
         <a href="/driver" class="btn btn-outline">Become a Driver</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="phone-frame">
+        <!-- Status bar -->
+        <div class="phone-status">
+          <span>9:41</span>
+          <span>▐▌▌ ▊</span>
+        </div>
+
+        <!-- Map zone -->
+        <div class="phone-map">
+          <div class="map-roads">
+            <svg width="100%" height="100%" viewBox="0 0 300 180" preserveAspectRatio="xMidYMid slice">
+              <!-- Road lines -->
+              <path d="M0,90 Q75,60 150,90 Q225,120 300,90" stroke="#2a2a2a" stroke-width="12" fill="none"/>
+              <path d="M0,90 Q75,60 150,90 Q225,120 300,90" stroke="#1f1f1f" stroke-width="8" fill="none"/>
+              <path d="M150,0 Q140,90 130,180" stroke="#2a2a2a" stroke-width="10" fill="none"/>
+              <path d="M150,0 Q140,90 130,180" stroke="#1f1f1f" stroke-width="6" fill="none"/>
+              <path d="M0,40 Q100,50 200,30 Q250,20 300,50" stroke="#222" stroke-width="8" fill="none"/>
+              <path d="M0,140 Q80,130 180,150 Q240,160 300,140" stroke="#222" stroke-width="7" fill="none"/>
+              <path d="M60,0 Q80,90 70,180" stroke="#1e1e1e" stroke-width="7" fill="none"/>
+              <path d="M230,0 Q220,90 240,180" stroke="#1e1e1e" stroke-width="7" fill="none"/>
+              <!-- Dashed centre lines -->
+              <path d="M0,90 Q75,60 150,90 Q225,120 300,90" stroke="#c9a227" stroke-width="1.5" fill="none" stroke-dasharray="12,12" opacity="0.25"/>
+            </svg>
+          </div>
+          <!-- Location pin -->
+          <div class="map-pickup-pin">
+            <div class="pin-dot green-pin"></div>
+            <div class="pin-label">Pickup</div>
+          </div>
+          <div class="map-dest-pin">
+            <div class="pin-dot orange-pin"></div>
+            <div class="pin-label">Destination</div>
+          </div>
+          <!-- Car marker -->
+          <div class="map-car">🚗</div>
+          <!-- My location -->
+          <div class="map-my-loc">
+            <div class="my-loc-pulse"></div>
+            <div class="my-loc-dot"></div>
+          </div>
+        </div>
+
+        <!-- Booking panel -->
+        <div class="booking-panel">
+          <!-- Search bar -->
+          <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <span class="search-placeholder">Where are you headed?</span>
+          </div>
+
+          <!-- Route fields -->
+          <div class="route-fields">
+            <div class="route-field">
+              <span class="route-dot" style="background:#27ae60"></span>
+              <div class="route-field-text">
+                <div class="route-field-label">Pickup</div>
+                <div class="route-field-val">Westlands, Nairobi</div>
+              </div>
+            </div>
+            <div class="route-divider">
+              <div class="route-line"></div>
+            </div>
+            <div class="route-field">
+              <span class="route-dot" style="background:#c9a227"></span>
+              <div class="route-field-text">
+                <div class="route-field-label">Destination</div>
+                <div class="route-field-val">JKIA Terminal 1A</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent -->
+          <div class="recent-label">RECENT</div>
+          <div class="recent-item">
+            <div class="recent-icon">🕐</div>
+            <div class="recent-text">
+              <div class="recent-name">Sarit Centre</div>
+              <div class="recent-sub">Westlands</div>
+            </div>
+            <div class="recent-time">8 min</div>
+          </div>
+          <div class="recent-item">
+            <div class="recent-icon">🕐</div>
+            <div class="recent-text">
+              <div class="recent-name">CBD, Nairobi</div>
+              <div class="recent-sub">City Centre</div>
+            </div>
+            <div class="recent-time">14 min</div>
+          </div>
+
+          <!-- Trip meta + CTA -->
+          <div class="trip-meta-row">
+            <div class="trip-meta-item">
+              <div class="trip-meta-label">Cost of Trip</div>
+              <div class="trip-meta-val">KSh 620</div>
+            </div>
+            <div class="trip-meta-sep"></div>
+            <div class="trip-meta-item">
+              <div class="trip-meta-label">Duration</div>
+              <div class="trip-meta-val">18 Mins</div>
+            </div>
+          </div>
+
+          <button class="find-driver-btn">Find a Driver</button>
+        </div>
       </div>
     </div>
   </section>
@@ -81,7 +192,7 @@
           <li><span class="check">✓</span> Instant ride booking</li>
           <li><span class="check">✓</span> Live GPS tracking</li>
           <li><span class="check">✓</span> M-Pesa & card payments</li>
-          <li><span class="check">✓</span> AI trip assistant</li>
+          <li><span class="check">✓</span> Fare estimate before booking</li>
           <li><span class="check">✓</span> Ride history & receipts</li>
         </ul>
         <a href="/passenger" class="btn btn-gold">Open Passenger App →</a>
@@ -131,14 +242,14 @@
         <p>See the full fare before you book — no surge surprises. Fixed rates on popular routes.</p>
       </div>
       <div class="card">
-        <div class="card-icon">🤖</div>
-        <h3>Gemini AI Assistant</h3>
-        <p>Chat with our AI for trip suggestions, route info, and instant customer support 24/7.</p>
+        <div class="card-icon">🌙</div>
+        <h3>Night Safe Rides</h3>
+        <p>Round-the-clock service with night-safe route options and real-time driver tracking at all hours.</p>
       </div>
       <div class="card">
-        <div class="card-icon">🌙</div>
-        <h3>Round the Clock</h3>
-        <p>Whether it's 3am or 3pm, Teddy Cabs is always running. Night-safe routes included.</p>
+        <div class="card-icon">📲</div>
+        <h3>M-Pesa Native</h3>
+        <p>Pay instantly via M-Pesa, card, or cash. Receipts land in your inbox seconds after every trip.</p>
       </div>
       <div class="card">
         <div class="card-icon">⭐</div>
@@ -149,7 +260,7 @@
   </div>
 
   <footer class="footer">
-    <span>TEDDY CABS</span> · Premium Ride Hailing · &copy; 2026 · Built with Kotlin &amp; Jetpack Compose
+    <span>TEDDY CABS</span> · Premium Ride Hailing · &copy; 2026 · Nairobi and beyond
   </footer>
 </div>
 </body>
