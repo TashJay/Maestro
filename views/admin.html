@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Teddy Cabs</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-brand"><div class="dot"></div>TEDDY CABS</div>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/passenger">Passenger</a>
+    <a href="/driver">Driver</a>
+    <a href="/admin" class="active">Admin</a>
+    <a href="/download-apk" class="nav-btn btn">↓ Get APK</a>
+  </div>
+</nav>
+
+<div class="page" style="height:calc(100vh - 64px);overflow:hidden;">
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Overview</div>
+        <button class="sidebar-item active" onclick="showPanel('dashboard', this)">
+          <span class="item-icon">📊</span> Dashboard
+        </button>
+        <button class="sidebar-item" onclick="showPanel('rides', this)">
+          <span class="item-icon">🚗</span> Live Rides
+          <span class="item-count">12</span>
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Users</div>
+        <button class="sidebar-item" onclick="showPanel('passengers', this)">
+          <span class="item-icon">🧑</span> Passengers
+        </button>
+        <button class="sidebar-item" onclick="showPanel('drivers', this)">
+          <span class="item-icon">🚙</span> Drivers
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Support</div>
+        <button class="sidebar-item" onclick="showPanel('tickets', this)">
+          <span class="item-icon">🎫</span> All Tickets
+          <span class="item-count red" id="open-count">7</span>
+        </button>
+        <button class="sidebar-item" onclick="showPanel('tickets', this); filterTickets('open')">
+          <span class="item-icon">🔴</span> Open
+        </button>
+        <button class="sidebar-item" onclick="showPanel('tickets', this); filterTickets('in_progress')">
+          <span class="item-icon">🟡</span> In Progress
+        </button>
+        <button class="sidebar-item" onclick="showPanel('tickets', this); filterTickets('resolved')">
+          <span class="item-icon">🟢</span> Resolved
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">System</div>
+        <button class="sidebar-item" onclick="showPanel('settings', this)">
+          <span class="item-icon">⚙️</span> Settings
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+
+      <!-- ═══ DASHBOARD PANEL ═══ -->
+      <div id="panel-dashboard" class="admin-panel active">
+        <div class="admin-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p>Welcome back, Admin · <span class="pulse-dot"></span> System operational</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="font-size:12px;color:var(--text-muted);" id="live-time"></span>
+            <button class="btn btn-ghost btn-sm" onclick="refreshStats()">⟳ Refresh</button>
+          </div>
+        </div>
+        <div class="admin-body">
+
+          <div class="admin-stats">
+            <div class="admin-stat">
+              <div class="stat-icon" style="background:#c9a22720;color:var(--gold);">💰</div>
+              <div class="stat-info">
+                <div class="val" style="color:var(--gold);">KSh 284K</div>
+                <div class="lbl">Revenue Today</div>
+                <div class="change change-up">↑ 12% from yesterday</div>
+              </div>
+            </div>
+            <div class="admin-stat">
+              <div class="stat-icon" style="background:#27ae6020;color:#2ecc71;">🚗</div>
+              <div class="stat-info">
+                <div class="val" style="color:#2ecc71;" id="stat-rides">1,248</div>
+                <div class="lbl">Rides Today</div>
+                <div class="change change-up">↑ 8% from yesterday</div>
+              </div>
+            </div>
+            <div class="admin-stat">
+              <div class="stat-icon" style="background:#2980b920;color:#5dade2;">👤</div>
+              <div class="stat-info">
+                <div class="val" style="color:#5dade2;">8,431</div>
+                <div class="lbl">Total Passengers</div>
+                <div class="change change-up">↑ 34 new today</div>
+              </div>
+            </div>
+            <div class="admin-stat">
+              <div class="stat-icon" style="background:#9b59b620;color:#a569bd;">🚙</div>
+              <div class="stat-info">
+                <div class="val" style="color:#a569bd;">840</div>
+                <div class="lbl">Active Drivers</div>
+                <div class="change change-up">↑ 6 new this week</div>
+              </div>
+            </div>
+            <div class="admin-stat">
+              <div class="stat-icon" style="background:#e74c3c20;color:#e74c3c;">🎫</div>
+              <div class="stat-info">
+                <div class="val" style="color:#e74c3c;" id="stat-tickets">7</div>
+                <div class="lbl">Open Tickets</div>
+                <div class="change change-down">↑ 2 new today</div>
+              </div>
+            </div>
+            <div class="admin-stat">
+              <div class="stat-icon" style="background:#c9a22720;color:var(--gold);">⭐</div>
+              <div class="stat-info">
+                <div class="val" style="color:var(--gold);">4.87</div>
+                <div class="lbl">Platform Rating</div>
+                <div class="change change-up">↑ 0.02 this week</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RECENT RIDES & QUICK ACTIONS -->
+          <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;">
+            <div class="table-card">
+              <div class="table-header">
+                <h3>Recent Rides</h3>
+                <button class="btn btn-ghost btn-sm" onclick="showPanel('rides', document.querySelector('[onclick*=rides]'))">View All →</button>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Passenger</th>
+                    <th>Driver</th>
+                    <th>Route</th>
+                    <th>Fare</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><div class="user-cell"><div class="avatar avatar-gold">AK</div><div><div class="user-name">Alex Kim</div></div></div></td>
+                    <td>James Otieno</td>
+                    <td style="font-size:12px;color:var(--text-muted);">Westlands → CBD</td>
+                    <td style="color:var(--gold);font-weight:700;">KSh 420</td>
+                    <td><span class="badge badge-progress">En Route</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="user-cell"><div class="avatar avatar-blue">SM</div><div><div class="user-name">Sarah Mwangi</div></div></div></td>
+                    <td>Peter Kamau</td>
+                    <td style="font-size:12px;color:var(--text-muted);">Karen → JKIA</td>
+                    <td style="color:var(--gold);font-weight:700;">KSh 1,200</td>
+                    <td><span class="badge badge-resolved">Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="user-cell"><div class="avatar avatar-green">DN</div><div><div class="user-name">David Njoroge</div></div></div></td>
+                    <td>Grace Wambui</td>
+                    <td style="font-size:12px;color:var(--text-muted);">Ngong Rd → Sarit</td>
+                    <td style="color:var(--gold);font-weight:700;">KSh 540</td>
+                    <td><span class="badge badge-new">Pickup</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="user-cell"><div class="avatar avatar-red">FO</div><div><div class="user-name">Fatuma Omar</div></div></div></td>
+                    <td>Samuel Kiprono</td>
+                    <td style="font-size:12px;color:var(--text-muted);">Kilimani → Gigiri</td>
+                    <td style="color:var(--gold);font-weight:700;">KSh 780</td>
+                    <td><span class="badge badge-resolved">Completed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- QUICK ACTIONS / OPEN TICKETS -->
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="table-card">
+                <div class="table-header"><h3>Quick Actions</h3></div>
+                <div style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+                  <button class="btn btn-gold btn-sm" style="justify-content:center;" onclick="showPanel('tickets', null)">🎫 View Support Tickets</button>
+                  <button class="btn btn-ghost btn-sm" style="justify-content:center;" onclick="showPanel('drivers', null)">🚙 Manage Drivers</button>
+                  <button class="btn btn-ghost btn-sm" style="justify-content:center;" onclick="showPanel('passengers', null)">🧑 Manage Passengers</button>
+                  <button class="btn btn-ghost btn-sm" style="justify-content:center;" onclick="showPanel('rides', null)">🗺️ Live Ride Map</button>
+                </div>
+              </div>
+
+              <div class="table-card">
+                <div class="table-header"><h3>Urgent Tickets</h3></div>
+                <div style="padding:12px 16px;" id="urgent-ticket-list"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ═══ LIVE RIDES PANEL ═══ -->
+      <div id="panel-rides" class="admin-panel">
+        <div class="admin-header">
+          <div><h1>Live Rides</h1><p>Real-time overview of active trips across the network</p></div>
+          <span class="badge badge-progress"><span class="pulse-dot"></span> &nbsp;12 active</span>
+        </div>
+        <div class="admin-body">
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Active & Recent Rides</h3>
+              <div class="table-actions">
+                <input class="search-input" placeholder="Search passenger or driver…" oninput="searchTable(this,'rides-table')" />
+                <select class="filter-select" onchange="filterRideStatus(this.value)">
+                  <option value="">All Status</option>
+                  <option value="En Route">En Route</option>
+                  <option value="Pickup">Pickup</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+            <table id="rides-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Passenger</th>
+                  <th>Driver</th>
+                  <th>Pickup</th>
+                  <th>Dropoff</th>
+                  <th>Fare</th>
+                  <th>Rating</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rides-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PASSENGERS PANEL ═══ -->
+      <div id="panel-passengers" class="admin-panel">
+        <div class="admin-header">
+          <div><h1>Passengers</h1><p>Manage all registered passenger accounts</p></div>
+          <button class="btn btn-gold btn-sm">+ Add Passenger</button>
+        </div>
+        <div class="admin-body">
+          <div class="table-card">
+            <div class="table-header">
+              <h3>All Passengers</h3>
+              <div class="table-actions">
+                <input class="search-input" placeholder="Search name or email…" oninput="searchTable(this,'passengers-table')" />
+                <select class="filter-select">
+                  <option>All Status</option>
+                  <option>Active</option>
+                  <option>Suspended</option>
+                </select>
+              </div>
+            </div>
+            <table id="passengers-table">
+              <thead>
+                <tr>
+                  <th>Passenger</th>
+                  <th>Phone</th>
+                  <th>Total Rides</th>
+                  <th>Spent</th>
+                  <th>Rating Given</th>
+                  <th>Joined</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="passengers-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ DRIVERS PANEL ═══ -->
+      <div id="panel-drivers" class="admin-panel">
+        <div class="admin-header">
+          <div><h1>Drivers</h1><p>Manage driver accounts, verifications and performance</p></div>
+          <button class="btn btn-gold btn-sm">+ Add Driver</button>
+        </div>
+        <div class="admin-body">
+          <div class="table-card">
+            <div class="table-header">
+              <h3>All Drivers</h3>
+              <div class="table-actions">
+                <input class="search-input" placeholder="Search name or licence…" oninput="searchTable(this,'drivers-table')" />
+                <select class="filter-select" onchange="filterDriverStatus(this.value)">
+                  <option value="">All Status</option>
+                  <option value="Online">Online</option>
+                  <option value="Offline">Offline</option>
+                  <option value="On Trip">On Trip</option>
+                  <option value="Suspended">Suspended</option>
+                </select>
+              </div>
+            </div>
+            <table id="drivers-table">
+              <thead>
+                <tr>
+                  <th>Driver</th>
+                  <th>Vehicle</th>
+                  <th>Licence</th>
+                  <th>Total Trips</th>
+                  <th>Rating</th>
+                  <th>Earnings (Month)</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="drivers-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ TICKETS PANEL ═══ -->
+      <div id="panel-tickets" class="admin-panel">
+        <div class="admin-header">
+          <div><h1>Support Tickets</h1><p>Customer support — respond and resolve issues</p></div>
+          <button class="btn btn-gold btn-sm" onclick="openNewTicket()">+ New Ticket</button>
+        </div>
+        <div class="admin-body">
+          <div class="table-card">
+            <div class="table-header">
+              <h3>All Tickets</h3>
+              <div class="table-actions">
+                <input class="search-input" placeholder="Search subject or user…" oninput="searchTable(this,'tickets-table')" />
+                <select class="filter-select" id="ticket-status-filter" onchange="filterTickets(this.value)">
+                  <option value="">All Status</option>
+                  <option value="open">Open</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+                <select class="filter-select" onchange="filterTicketPriority(this.value)">
+                  <option value="">All Priority</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+            </div>
+            <table id="tickets-table">
+              <thead>
+                <tr>
+                  <th>Ticket</th>
+                  <th>User</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Assigned</th>
+                  <th>Created</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tickets-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SETTINGS PANEL ═══ -->
+      <div id="panel-settings" class="admin-panel">
+        <div class="admin-header">
+          <div><h1>Settings</h1><p>Platform configuration and system preferences</p></div>
+        </div>
+        <div class="admin-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px;">
+            <div class="table-card">
+              <div class="table-header"><h3>Pricing Settings</h3></div>
+              <div style="padding:20px;display:flex;flex-direction:column;gap:16px;">
+                <div>
+                  <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;letter-spacing:1px;">BASE FARE (KSh)</label>
+                  <input type="number" value="80" class="search-input" style="width:100%;" />
+                </div>
+                <div>
+                  <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;letter-spacing:1px;">PER KM RATE (KSh)</label>
+                  <input type="number" value="55" class="search-input" style="width:100%;" />
+                </div>
+                <div>
+                  <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;letter-spacing:1px;">SURGE MULTIPLIER MAX</label>
+                  <input type="number" value="2.5" step="0.1" class="search-input" style="width:100%;" />
+                </div>
+                <div>
+                  <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;letter-spacing:1px;">DRIVER COMMISSION (%)</label>
+                  <input type="number" value="80" class="search-input" style="width:100%;" />
+                </div>
+                <button class="btn btn-gold btn-sm" style="justify-content:center;" onclick="showToast('Pricing settings saved ✓', 'green')">Save Changes</button>
+              </div>
+            </div>
+
+            <div class="table-card">
+              <div class="table-header"><h3>Notifications</h3></div>
+              <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                  <span style="font-size:14px;">Email alerts for new tickets</span>
+                  <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--gold);" />
+                </label>
+                <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                  <span style="font-size:14px;">SMS on high-priority tickets</span>
+                  <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--gold);" />
+                </label>
+                <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                  <span style="font-size:14px;">Driver suspension alerts</span>
+                  <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--gold);" />
+                </label>
+                <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                  <span style="font-size:14px;">Daily revenue summary</span>
+                  <input type="checkbox" style="width:18px;height:18px;accent-color:var(--gold);" />
+                </label>
+                <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                  <span style="font-size:14px;">Fraud detection alerts</span>
+                  <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--gold);" />
+                </label>
+                <button class="btn btn-gold btn-sm" style="justify-content:center;margin-top:8px;" onclick="showToast('Notification preferences saved ✓', 'green')">Save Preferences</button>
+              </div>
+            </div>
+
+            <div class="table-card">
+              <div class="table-header"><h3>App Configuration</h3></div>
+              <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <div>
+                  <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;letter-spacing:1px;">SUPPORT EMAIL</label>
+                  <input type="email" value="support@teddycabs.co.ke" class="search-input" style="width:100%;" />
+                </div>
+                <div>
+                  <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;letter-spacing:1px;">SUPPORT PHONE</label>
+                  <input type="tel" value="+254 700 000 000" class="search-input" style="width:100%;" />
+                </div>
+                <div>
+                  <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;letter-spacing:1px;">MAX RADIUS (km)</label>
+                  <input type="number" value="15" class="search-input" style="width:100%;" />
+                </div>
+                <button class="btn btn-gold btn-sm" style="justify-content:center;" onclick="showToast('App config updated ✓', 'green')">Save Config</button>
+              </div>
+            </div>
+
+            <div class="table-card">
+              <div class="table-header"><h3>System Status</h3></div>
+              <div style="padding:20px;display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+                  <span style="font-size:14px;">API Server</span>
+                  <span class="badge badge-resolved"><span class="pulse-dot"></span> &nbsp;Operational</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+                  <span style="font-size:14px;">Database</span>
+                  <span class="badge badge-resolved"><span class="pulse-dot"></span> &nbsp;Operational</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+                  <span style="font-size:14px;">M-Pesa Gateway</span>
+                  <span class="badge badge-resolved"><span class="pulse-dot"></span> &nbsp;Operational</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+                  <span style="font-size:14px;">Google Maps API</span>
+                  <span class="badge badge-resolved"><span class="pulse-dot"></span> &nbsp;Operational</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
+                  <span style="font-size:14px;">Gemini AI</span>
+                  <span class="badge badge-progress">Degraded</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- TICKET MODAL -->
+<div class="modal-overlay" id="ticket-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;" id="modal-ticket-id"></div>
+        <h2 style="font-size:18px;font-weight:700;" id="modal-subject"></h2>
+        <div style="display:flex;gap:8px;margin-top:8px;" id="modal-badges"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-messages"></div>
+      <div style="margin-top:20px;">
+        <label style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:8px;">REPLY AS SUPPORT AGENT</label>
+        <textarea class="reply-area" id="reply-text" placeholder="Type your response…"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;justify-content:space-between;">
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-gold btn-sm" onclick="sendReply()">Send Reply</button>
+            <button class="btn btn-ghost btn-sm" id="resolve-btn" onclick="resolveTicket()">✓ Mark Resolved</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="color:#e74c3c;" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW TICKET MODAL -->
+<div class="modal-overlay" id="new-ticket-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h2 style="font-size:18px;font-weight:700;">Create New Ticket</h2></div>
+      <button class="modal-close" onclick="closeNewTicket()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:6px;">SUBJECT</label>
+          <input type="text" id="new-subject" class="search-input" style="width:100%;" placeholder="Describe the issue…" />
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:6px;">CATEGORY</label>
+            <select id="new-category" class="filter-select" style="width:100%;">
+              <option>Payment Issue</option>
+              <option>Trip Dispute</option>
+              <option>Driver Complaint</option>
+              <option>App Bug</option>
+              <option>Account Issue</option>
+              <option>Safety Concern</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:6px;">PRIORITY</label>
+            <select id="new-priority" class="filter-select" style="width:100%;">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:6px;">USER (NAME OR EMAIL)</label>
+          <input type="text" id="new-user" class="search-input" style="width:100%;" placeholder="e.g. Alex Kim" />
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:6px;">DESCRIPTION</label>
+          <textarea class="reply-area" id="new-description" placeholder="Full details of the issue…" style="min-height:100px;"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn btn-ghost btn-sm" onclick="closeNewTicket()">Cancel</button>
+          <button class="btn btn-gold btn-sm" onclick="createTicket()">Create Ticket</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────
+const AVATARS = ['avatar-gold','avatar-blue','avatar-red','avatar-green'];
+const initials = n => n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const av = i => AVATARS[i % AVATARS.length];
+
+let tickets = [
+  {id:'TC-1042', subject:'M-Pesa payment deducted but ride not confirmed', user:'Alex Kim', userEmail:'alex.kim@email.com', category:'Payment Issue', priority:'high', status:'open', assigned:'Unassigned', created:'2h ago', messages:[
+    {from:'Alex Kim', time:'2h ago', text:"I was charged KSh 420 via M-Pesa but the app shows my ride was cancelled. Please help.", staff:false},
+  ]},
+  {id:'TC-1041', subject:'Driver asked for extra cash on top of app price', user:'Sarah Mwangi', userEmail:'s.mwangi@email.com', category:'Driver Complaint', priority:'high', status:'open', assigned:'Grace A.', created:'3h ago', messages:[
+    {from:'Sarah Mwangi', time:'3h ago', text:"Driver demanded KSh 200 extra and refused to move until I paid.", staff:false},
+    {from:'Grace A.', time:'2h ago', text:"We are very sorry to hear this. We are investigating the driver now and will update you within 2 hours.", staff:true},
+  ]},
+  {id:'TC-1040', subject:'App crashes when I try to book from Kilimani', user:'David Njoroge', userEmail:'d.njoroge@email.com', category:'App Bug', priority:'medium', status:'in_progress', assigned:'Tech Team', created:'5h ago', messages:[
+    {from:'David Njoroge', time:'5h ago', text:"Every time I open the app and enter Kilimani as my pickup, it crashes immediately.", staff:false},
+    {from:'Tech Team', time:'4h ago', text:"Thank you for reporting this. Could you share your device model and app version?", staff:true},
+    {from:'David Njoroge', time:'3h ago', text:"Samsung Galaxy A54, app version 1.2.3.", staff:false},
+  ]},
+  {id:'TC-1039', subject:'Wrong amount shown on receipt', user:'Fatuma Omar', userEmail:'f.omar@email.com', category:'Payment Issue', priority:'low', status:'in_progress', assigned:'Grace A.', created:'1d ago', messages:[
+    {from:'Fatuma Omar', time:'1d ago', text:"My receipt shows KSh 650 but I was charged KSh 780 on M-Pesa.", staff:false},
+  ]},
+  {id:'TC-1038', subject:'Cannot update phone number on account', user:'James Otieno', userEmail:'j.otieno@email.com', category:'Account Issue', priority:'low', status:'resolved', assigned:'Grace A.', created:'2d ago', messages:[
+    {from:'James Otieno', time:'2d ago', text:"I changed my phone number and the app won't let me update it.", staff:false},
+    {from:'Grace A.', time:'1d ago', text:"Please go to Profile → Settings → Contact Details. If still stuck, we can update it manually.", staff:true},
+    {from:'James Otieno', time:'1d ago', text:"Worked perfectly, thank you!", staff:false},
+  ]},
+  {id:'TC-1037', subject:'Ride was cancelled by driver mid-trip', user:'Peter Kamau', userEmail:'p.kamau@email.com', category:'Trip Dispute', priority:'high', status:'open', assigned:'Unassigned', created:'4h ago', messages:[
+    {from:'Peter Kamau', time:'4h ago', text:"Driver cancelled the ride halfway and drove off. I was left stranded in the dark.", staff:false},
+  ]},
+  {id:'TC-1036', subject:'Promo code not applying at checkout', user:'Grace Wambui', userEmail:'g.wambui@email.com', category:'App Bug', priority:'medium', status:'open', assigned:'Tech Team', created:'6h ago', messages:[
+    {from:'Grace Wambui', time:'6h ago', text:"Code TEDDY20 keeps saying invalid even though it was sent to me by email.", staff:false},
+    {from:'Tech Team', time:'5h ago', text:"We're checking if the code is correctly linked to your account.", staff:true},
+  ]},
+  {id:'TC-1035', subject:'Driver did not follow requested route', user:'Samuel Kiprono', userEmail:'s.kiprono@email.com', category:'Trip Dispute', priority:'low', status:'resolved', assigned:'Grace A.', created:'3d ago', messages:[
+    {from:'Samuel Kiprono', time:'3d ago', text:"Driver took a longer route and charged more than the estimate.", staff:false},
+    {from:'Grace A.', time:'2d ago', text:"We've reviewed the GPS data and issued a partial refund of KSh 120 to your M-Pesa.", staff:true},
+    {from:'Samuel Kiprono', time:'2d ago', text:"Received the refund. Thank you for resolving quickly.", staff:false},
+  ]},
+];
+
+let passengers = [
+  {name:'Alex Kim', email:'alex.kim@email.com', phone:'+254 712 345 678', rides:42, spent:'KSh 18,480', rating:'4.7', joined:'Jan 2025', status:'Active'},
+  {name:'Sarah Mwangi', email:'s.mwangi@email.com', phone:'+254 723 456 789', rides:28, spent:'KSh 22,100', rating:'4.9', joined:'Mar 2025', status:'Active'},
+  {name:'David Njoroge', email:'d.njoroge@email.com', phone:'+254 734 567 890', rides:15, spent:'KSh 8,320', rating:'4.5', joined:'Jun 2025', status:'Active'},
+  {name:'Fatuma Omar', email:'f.omar@email.com', phone:'+254 745 678 901', rides:67, spent:'KSh 41,200', rating:'4.8', joined:'Oct 2024', status:'Active'},
+  {name:'Peter Kamau', email:'p.kamau@email.com', phone:'+254 756 789 012', rides:9, spent:'KSh 4,100', rating:'4.2', joined:'Aug 2025', status:'Active'},
+  {name:'Grace Wambui', email:'g.wambui@email.com', phone:'+254 767 890 123', rides:31, spent:'KSh 16,800', rating:'4.6', joined:'Feb 2025', status:'Active'},
+  {name:'Samuel Kiprono', email:'s.kiprono@email.com', phone:'+254 778 901 234', rides:5, spent:'KSh 2,200', rating:'3.9', joined:'Sep 2025', status:'Suspended'},
+];
+
+let drivers = [
+  {name:'James Otieno', email:'j.otieno@email.com', vehicle:'Toyota Wish · KCA 456B', licence:'DL-20948', trips:1240, rating:'4.92', earnings:'KSh 62,400', status:'On Trip'},
+  {name:'Peter Kamau', email:'p.kamau2@email.com', vehicle:'Honda Fit · KCB 123X', licence:'DL-18372', trips:890, rating:'4.78', earnings:'KSh 48,200', status:'Online'},
+  {name:'Grace Wambui', email:'g.wambui2@email.com', vehicle:'Nissan Note · KCC 789M', licence:'DL-22104', trips:560, rating:'4.85', earnings:'KSh 31,600', status:'Offline'},
+  {name:'Samuel Kiprono', email:'s.kiprono2@email.com', vehicle:'Toyota Axio · KCD 321N', licence:'DL-19283', trips:342, rating:'4.61', earnings:'KSh 18,900', status:'Online'},
+  {name:'Monica Achieng', email:'m.achieng@email.com', vehicle:'Suzuki Swift · KCE 654P', licence:'DL-24019', trips:128, rating:'4.95', earnings:'KSh 7,200', status:'Offline'},
+  {name:'Brian Mutua', email:'b.mutua@email.com', vehicle:'Toyota Passo · KCF 987Q', licence:'DL-23788', trips:78, rating:'3.80', earnings:'KSh 4,100', status:'Suspended'},
+];
+
+let rides = [
+  {id:'R-8821', passenger:'Alex Kim', driver:'James Otieno', pickup:'Westlands', dropoff:'CBD', fare:'KSh 420', rating:'—', status:'En Route'},
+  {id:'R-8820', passenger:'Sarah Mwangi', driver:'Peter Kamau', pickup:'Karen', dropoff:'JKIA', fare:'KSh 1,200', rating:'5★', status:'Completed'},
+  {id:'R-8819', passenger:'David Njoroge', driver:'Grace Wambui', pickup:'Ngong Rd', dropoff:'Sarit', fare:'KSh 540', rating:'—', status:'Pickup'},
+  {id:'R-8818', passenger:'Fatuma Omar', driver:'Samuel Kiprono', pickup:'Kilimani', dropoff:'Gigiri', fare:'KSh 780', rating:'4★', status:'Completed'},
+  {id:'R-8817', passenger:'Grace Wambui', driver:'Monica Achieng', pickup:'Upperhill', dropoff:'Yaya', fare:'KSh 310', rating:'5★', status:'Completed'},
+  {id:'R-8816', passenger:'Peter Kamau', driver:'Brian Mutua', pickup:'Buruburu', dropoff:'Westlands', fare:'KSh 650', rating:'—', status:'Cancelled'},
+  {id:'R-8815', passenger:'Samuel Kiprono', driver:'James Otieno', pickup:'Lavington', dropoff:'Karen', fare:'KSh 920', rating:'5★', status:'Completed'},
+  {id:'R-8814', passenger:'Alex Kim', driver:'Peter Kamau', pickup:'Kileleshwa', dropoff:'CBD', fare:'KSh 380', rating:'4★', status:'Completed'},
+];
+
+// ─── CURRENT TICKET ──────────────────────────────────────
+let currentTicketId = null;
+
+// ─── PANELS ─────────────────────────────────────────────
+function showPanel(name, btn) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (btn) {
+    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  if (name === 'tickets') renderTickets();
+  if (name === 'passengers') renderPassengers();
+  if (name === 'drivers') renderDrivers();
+  if (name === 'rides') renderRides();
+}
+
+// ─── RENDERS ────────────────────────────────────────────
+function statusBadge(s) {
+  const map = {
+    open: 'badge-open', in_progress: 'badge-progress', resolved: 'badge-resolved',
+    'En Route': 'badge-progress', Completed: 'badge-resolved', Pickup: 'badge-new',
+    Cancelled: 'badge-open', Online: 'badge-resolved', Offline: 'badge-new',
+    'On Trip': 'badge-progress', Suspended: 'badge-open', Active: 'badge-resolved',
+  };
+  const labels = { open:'Open', in_progress:'In Progress', resolved:'Resolved' };
+  const label = labels[s] || s;
+  return `<span class="badge ${map[s]||'badge-new'}">${label}</span>`;
+}
+
+function priorityBadge(p) {
+  const map = {high:'badge-high', medium:'badge-med', low:'badge-low'};
+  return `<span class="badge ${map[p]||'badge-med'}">${p.charAt(0).toUpperCase()+p.slice(1)}</span>`;
+}
+
+function renderTickets(filter = '', priorityFilter = '') {
+  const tbody = document.getElementById('tickets-tbody');
+  const filtered = tickets.filter(t =>
+    (!filter || t.status === filter) &&
+    (!priorityFilter || t.priority === priorityFilter)
+  );
+  tbody.innerHTML = filtered.map((t, i) => `
+    <tr>
+      <td>
+        <div class="user-name" style="font-family:monospace;font-size:12px;color:var(--gold);">${t.id}</div>
+        <div style="font-size:12px;color:var(--text);margin-top:2px;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.subject}</div>
+      </td>
+      <td>
+        <div class="user-cell">
+          <div class="avatar ${av(i)}">${initials(t.user)}</div>
+          <div><div class="user-name">${t.user}</div><div class="user-email">${t.userEmail}</div></div>
+        </div>
+      </td>
+      <td style="color:var(--text-muted);font-size:12px;">${t.category}</td>
+      <td>${priorityBadge(t.priority)}</td>
+      <td style="font-size:12px;">${t.assigned}</td>
+      <td style="font-size:12px;color:var(--text-muted);">${t.created}</td>
+      <td>${statusBadge(t.status)}</td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn" title="Open ticket" onclick="openTicket('${t.id}')">↗</button>
+          ${t.status !== 'resolved' ? `<button class="action-btn success" title="Resolve" onclick="quickResolve('${t.id}')">✓</button>` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">No tickets match this filter</td></tr>';
+}
+
+function renderPassengers() {
+  const tbody = document.getElementById('passengers-tbody');
+  tbody.innerHTML = passengers.map((p, i) => `
+    <tr>
+      <td>
+        <div class="user-cell">
+          <div class="avatar ${av(i)}">${initials(p.name)}</div>
+          <div><div class="user-name">${p.name}</div><div class="user-email">${p.email}</div></div>
+        </div>
+      </td>
+      <td style="font-size:13px;">${p.phone}</td>
+      <td style="font-weight:600;">${p.rides}</td>
+      <td style="color:var(--gold);font-weight:700;">${p.spent}</td>
+      <td>${p.rating}★</td>
+      <td style="font-size:12px;color:var(--text-muted);">${p.joined}</td>
+      <td>${statusBadge(p.status)}</td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn" title="View profile" onclick="showToast('Opening profile for ${p.name}…','gold')">👤</button>
+          <button class="action-btn danger" title="Suspend" onclick="showToast('${p.name} suspended','gold')">⊘</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderDrivers(filter = '') {
+  const tbody = document.getElementById('drivers-tbody');
+  const filtered = filter ? drivers.filter(d => d.status === filter) : drivers;
+  tbody.innerHTML = filtered.map((d, i) => `
+    <tr>
+      <td>
+        <div class="user-cell">
+          <div class="avatar ${av(i)}">${initials(d.name)}</div>
+          <div><div class="user-name">${d.name}</div><div class="user-email">${d.email}</div></div>
+        </div>
+      </td>
+      <td style="font-size:12px;">${d.vehicle}</td>
+      <td style="font-family:monospace;font-size:12px;color:var(--text-muted);">${d.licence}</td>
+      <td style="font-weight:600;">${d.trips}</td>
+      <td>${d.rating}★</td>
+      <td style="color:var(--gold);font-weight:700;">${d.earnings}</td>
+      <td>${statusBadge(d.status)}</td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn" title="View profile" onclick="showToast('Opening profile for ${d.name}…','gold')">👤</button>
+          <button class="action-btn danger" title="Suspend" onclick="showToast('${d.name} ${d.status==='Suspended'?'reactivated':'suspended'}','gold')">⊘</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderRides(filter = '') {
+  const tbody = document.getElementById('rides-tbody');
+  const filtered = filter ? rides.filter(r => r.status === filter) : rides;
+  tbody.innerHTML = filtered.map((r, i) => `
+    <tr>
+      <td style="font-family:monospace;font-size:12px;color:var(--gold);">${r.id}</td>
+      <td>${r.passenger}</td>
+      <td>${r.driver}</td>
+      <td style="font-size:12px;color:var(--text-muted);">${r.pickup}</td>
+      <td style="font-size:12px;color:var(--text-muted);">${r.dropoff}</td>
+      <td style="color:var(--gold);font-weight:700;">${r.fare}</td>
+      <td style="font-size:12px;">${r.rating}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn" onclick="showToast('Opening ride details ${r.id}…','gold')">↗</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ─── TICKET DETAIL ───────────────────────────────────────
+function openTicket(id) {
+  const t = tickets.find(x => x.id === id);
+  if (!t) return;
+  currentTicketId = id;
+  document.getElementById('modal-ticket-id').textContent = t.id + ' · ' + t.category;
+  document.getElementById('modal-subject').textContent = t.subject;
+  document.getElementById('modal-badges').innerHTML = statusBadge(t.status) + ' ' + priorityBadge(t.priority);
+  document.getElementById('modal-messages').innerHTML = t.messages.map(m => `
+    <div class="message-bubble ${m.staff ? 'staff' : ''}">
+      <div class="bubble-meta">
+        <span class="bubble-from">${m.from} ${m.staff ? '(Support)' : '(User)'}</span>
+        <span>${m.time}</span>
+      </div>
+      <div style="font-size:14px;line-height:1.6;">${m.text}</div>
+    </div>
+  `).join('');
+  const resolveBtn = document.getElementById('resolve-btn');
+  resolveBtn.style.display = t.status === 'resolved' ? 'none' : '';
+  document.getElementById('ticket-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('ticket-modal').classList.remove('open');
+  document.getElementById('reply-text').value = '';
+  currentTicketId = null;
+}
+
+function sendReply() {
+  const text = document.getElementById('reply-text').value.trim();
+  if (!text) { showToast('Please enter a reply message', 'gold'); return; }
+  const t = tickets.find(x => x.id === currentTicketId);
+  if (!t) return;
+  t.messages.push({from:'Support Agent', time:'Just now', text, staff:true});
+  if (t.status === 'open') t.status = 'in_progress';
+  openTicket(currentTicketId);
+  document.getElementById('reply-text').value = '';
+  renderTickets();
+  updateOpenCount();
+  showToast('Reply sent ✓', 'green');
+}
+
+function resolveTicket() {
+  const t = tickets.find(x => x.id === currentTicketId);
+  if (!t) return;
+  t.status = 'resolved';
+  t.messages.push({from:'Support Agent', time:'Just now', text:'This ticket has been marked as resolved. Please reach out if you need further assistance.', staff:true});
+  openTicket(currentTicketId);
+  renderTickets();
+  updateOpenCount();
+  showToast('Ticket resolved ✓', 'green');
+}
+
+function quickResolve(id) {
+  const t = tickets.find(x => x.id === id);
+  if (!t) return;
+  t.status = 'resolved';
+  renderTickets();
+  updateOpenCount();
+  showToast(id + ' marked as resolved ✓', 'green');
+}
+
+function filterTickets(val) {
+  document.getElementById('ticket-status-filter').value = val;
+  renderTickets(val);
+}
+
+function filterTicketPriority(val) {
+  const statusFilter = document.getElementById('ticket-status-filter').value;
+  renderTickets(statusFilter, val);
+}
+
+function filterRideStatus(val) { renderRides(val); }
+function filterDriverStatus(val) { renderDrivers(val); }
+
+// ─── NEW TICKET ──────────────────────────────────────────
+function openNewTicket() {
+  document.getElementById('new-ticket-modal').classList.add('open');
+}
+
+function closeNewTicket() {
+  document.getElementById('new-ticket-modal').classList.remove('open');
+}
+
+function createTicket() {
+  const subject = document.getElementById('new-subject').value.trim();
+  const user = document.getElementById('new-user').value.trim() || 'Anonymous';
+  const category = document.getElementById('new-category').value;
+  const priority = document.getElementById('new-priority').value;
+  const desc = document.getElementById('new-description').value.trim();
+  if (!subject) { showToast('Please enter a subject', 'gold'); return; }
+  const newId = 'TC-' + (1043 + tickets.length);
+  tickets.unshift({
+    id: newId, subject, user, userEmail: user.toLowerCase().replace(/\s/g,'') + '@example.com',
+    category, priority, status: 'open', assigned: 'Unassigned', created: 'Just now',
+    messages: desc ? [{from:'Admin', time:'Just now', text: desc, staff:true}] : []
+  });
+  closeNewTicket();
+  showPanel('tickets', null);
+  renderTickets();
+  updateOpenCount();
+  showToast(newId + ' created ✓', 'green');
+  ['new-subject','new-user','new-description'].forEach(id => document.getElementById(id).value = '');
+}
+
+// ─── SEARCH ──────────────────────────────────────────────
+function searchTable(input, tableId) {
+  const q = input.value.toLowerCase();
+  document.querySelectorAll('#' + tableId + ' tbody tr').forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ─── OPEN COUNT ──────────────────────────────────────────
+function updateOpenCount() {
+  const open = tickets.filter(t => t.status !== 'resolved').length;
+  document.getElementById('open-count').textContent = open;
+  document.getElementById('stat-tickets').textContent = open;
+}
+
+// ─── URGENT TICKET LIST ──────────────────────────────────
+function renderUrgentTickets() {
+  const el = document.getElementById('urgent-ticket-list');
+  const urgent = tickets.filter(t => t.priority === 'high' && t.status !== 'resolved').slice(0,3);
+  el.innerHTML = urgent.length ? urgent.map(t => `
+    <div style="padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="showPanel('tickets',null);openTicket('${t.id}')">
+      <div style="font-size:11px;font-family:monospace;color:var(--gold);">${t.id}</div>
+      <div style="font-size:13px;font-weight:600;margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.subject}</div>
+      <div style="font-size:11px;color:var(--text-muted);">${t.user} · ${t.created}</div>
+    </div>
+  `).join('') : '<p style="color:var(--text-muted);font-size:13px;padding:8px 0;">No urgent tickets 🎉</p>';
+}
+
+// ─── TOAST ───────────────────────────────────────────────
+function showToast(msg, type='gold') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type + ' show';
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ─── STATS REFRESH ───────────────────────────────────────
+function refreshStats() {
+  const ridesEl = document.getElementById('stat-rides');
+  ridesEl.textContent = (parseInt(ridesEl.textContent.replace(',','')) + Math.floor(Math.random()*3+1)).toLocaleString();
+  showToast('Dashboard refreshed ✓', 'green');
+}
+
+// ─── LIVE CLOCK ──────────────────────────────────────────
+function updateClock() {
+  const el = document.getElementById('live-time');
+  if (el) el.textContent = new Date().toLocaleTimeString('en-KE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+
+// ─── INIT ────────────────────────────────────────────────
+updateOpenCount();
+renderUrgentTickets();
+updateClock();
+setInterval(updateClock, 1000);
+
+// Close modals on overlay click
+document.getElementById('ticket-modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+document.getElementById('new-ticket-modal').addEventListener('click', function(e){ if(e.target===this) closeNewTicket(); });
+</script>
+</body>
+</html>
